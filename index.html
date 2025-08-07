@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sélection des Matières - Enseignants</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-box {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .semester {
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #3498db;
+        }
+
+        .semester h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .subject-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .subject-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            border-color: #3498db;
+        }
+
+        .subject-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .subject-name {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1.1em;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .subject-code {
+            background: #e74c3c;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .hours-info {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .hour-item {
+            background: #ecf0f1;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: #2c3e50;
+        }
+
+        .selection-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .checkbox-container:hover {
+            background: #e9ecef;
+            transform: scale(1.05);
+        }
+
+        .checkbox-container.checked {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-label {
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .summary {
+            position: sticky;
+            top: 20px;
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+
+        .summary h3 {
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            text-align: center;
+        }
+
+        .counter {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .selected-list {
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .selected-item {
+            padding: 8px;
+            margin-bottom: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            disabled: false;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .submit-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(231, 76, 60, 0.1);
+            border-radius: 8px;
+        }
+
+        .teacher-info-section {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.2);
+        }
+
+        .teacher-info-section h2 {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .teacher-form {
+            display: flex;
+            justify-content: center;
+        }
+
+        .input-group {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 1.1em;
+        }
+
+        .teacher-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            font-size: 1.1em;
+            background: rgba(255, 255, 255, 0.95);
+            color: #2c3e50;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .teacher-input:focus {
+            outline: none;
+            border-color: #27ae60;
+            background: white;
+            box-shadow: 0 5px 20px rgba(39, 174, 96, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .teacher-input::placeholder {
+            color: #7f8c8d;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .subject-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .selection-options {
+                justify-content: flex-start;
+            }
+
+            .teacher-form {
+                flex-direction: column;
+            }
+            
+            .input-group {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Sélection des Matières d'Enseignement</h1>
+        
+        <div class="info-box">
+            Veuillez sélectionner au moins 5 choix (matière + type de cours). Vous pouvez choisir cours, TD et/ou TP pour chaque matière selon votre préférence.
+        </div>
+
+        <form id="selectionForm">
+            <!-- Section Informations Enseignant -->
+            <div class="teacher-info-section">
+                <h2>👨‍🏫 Informations de l'Enseignant</h2>
+                <div class="teacher-form">
+                    <div class="input-group">
+                        <label for="teacherName" class="input-label">Nom complet *</label>
+                        <input type="text" id="teacherName" name="teacherName" class="teacher-input" 
+                               placeholder="Entrez votre nom complet" required>
+                    </div>
+                </div>
+            </div>
+            <!-- Semestre 3 -->
+            <div class="semester">
+                <h2>📚 Semestre 3</h2>
+                <div class="subject-grid">
+                    <div class="subject-card">
+                        <div class="subject-header">
+                            <div class="subject-name">Algèbre 3</div>
+                            <div class="subject-code">UEF311</div>
+                        </div>
+                        <div class="hours-info">
+                            <div class="hour-item">Cours: 1h30</div>
+                            <div class="hour-item">TD: 1h30</div>
+                            <div class="hour-item">TP: 0h</div>
+                        </div>
+                        <div class="selection-options">
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Algèbre 3 - Cours" id="alg3_cours">
+                                <label class="checkbox-label" for="alg3_cours">Cours</label>
+                            </div>
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Algèbre 3 - TD" id="alg3_td">
+                                <label class="checkbox-label" for="alg3_td">TD</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subject-card">
+                        <div class="subject-header">
+                            <div class="subject-name">Analyse 3</div>
+                            <div class="subject-code">UEF312</div>
+                        </div>
+                        <div class="hours-info">
+                            <div class="hour-item">Cours: 3h</div>
+                            <div class="hour-item">TD: 3h</div>
+                            <div class="hour-item">TP: 0h</div>
+                        </div>
+                        <div class="selection-options">
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Analyse 3 - Cours" id="ana3_cours">
+                                <label class="checkbox-label" for="ana3_cours">Cours</label>
+                            </div>
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Analyse 3 - TD" id="ana3_td">
+                                <label class="checkbox-label" for="ana3_td">TD</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subject-card">
+                        <div class="subject-header">
+                            <div class="subject-name">Introduction à la topologie</div>
+                            <div class="subject-code">UEF313</div>
+                        </div>
+                        <div class="hours-info">
+                            <div class="hour-item">Cours: 3h</div>
+                            <div class="hour-item">TD: 3h</div>
+                            <div class="hour-item">TP: 0h</div>
+                        </div>
+                        <div class="selection-options">
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Introduction à la topologie - Cours" id="topo_cours">
+                                <label class="checkbox-label" for="topo_cours">Cours</label>
+                            </div>
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Introduction à la topologie - TD" id="topo_td">
+                                <label class="checkbox-label" for="topo_td">TD</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subject-card">
+                        <div class="subject-header">
+                            <div class="subject-name">Analyse numérique 1</div>
+                            <div class="subject-code">UEM311</div>
+                        </div>
+                        <div class="hours-info">
+                            <div class="hour-item">Cours: 1h30</div>
+                            <div class="hour-item">TD: 1h30</div>
+                            <div class="hour-item">TP: 1h30</div>
+                        </div>
+                        <div class="selection-options">
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Analyse numérique 1 - Cours" id="anum1_cours">
+                                <label class="checkbox-label" for="anum1_cours">Cours</label>
+                            </div>
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Analyse numérique 1 - TD" id="anum1_td">
+                                <label class="checkbox-label" for="anum1_td">TD</label>
+                            </div>
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Analyse numérique 1 - TP" id="anum1_tp">
+                                <label class="checkbox-label" for="anum1_tp">TP</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subject-card">
+                        <div class="subject-header">
+                            <div class="subject-name">Logique Mathématique</div>
+                            <div class="subject-code">UEM312</div>
+                        </div>
+                        <div class="hours-info">
+                            <div class="hour-item">Cours: 1h30</div>
+                            <div class="hour-item">TD: 1h30</div>
+                            <div class="hour-item">TP: 0h</div>
+                        </div>
+                        <div class="selection-options">
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Logique Mathématique - Cours" id="logique_cours">
+                                <label class="checkbox-label" for="logique_cours">Cours</label>
+                            </div>
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Logique Mathématique - TD" id="logique_td">
+                                <label class="checkbox-label" for="logique_td">TD</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subject-card">
+                        <div class="subject-header">
+                            <div class="subject-name">Calcul scientifique avancé avec Python</div>
+                            <div class="subject-code">UEM313</div>
+                        </div>
+                        <div class="hours-info">
+                            <div class="hour-item">Cours: 1h30</div>
+                            <div class="hour-item">TD: 0h</div>
+                            <div class="hour-item">TP: 1h30</div>
+                        </div>
+                        <div class="selection-options">
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Calcul scientifique avancé avec Python - Cours" id="python_cours">
+                                <label class="checkbox-label" for="python_cours">Cours</label>
+                            </div>
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Calcul scientifique avancé avec Python - TP" id="python_tp">
+                                <label class="checkbox-label" for="python_tp">TP</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subject-card">
+                        <div class="subject-header">
+                            <div class="subject-name">Introduction à Latex</div>
+                            <div class="subject-code">UD311</div>
+                        </div>
+                        <div class="hours-info">
+                            <div class="hour-item">Cours: 1h30</div>
+                            <div class="hour-item">TD: 0h</div>
+                            <div class="hour-item">TP: 0h</div>
+                        </div>
+                        <div class="selection-options">
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Introduction à Latex - Cours" id="latex_cours">
+                                <label class="checkbox-label" for="latex_cours">Cours</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semestre 5 -->
+            <div class="semester">
+                <h2>📊 Semestre 5</h2>
+                <div class="subject-grid">
+                    <div class="subject-card">
+                        <div class="subject-header">
+                            <div class="subject-name">Probabilités avancées</div>
+                            <div class="subject-code">UEF511</div>
+                        </div>
+                        <div class="hours-info">
+                            <div class="hour-item">Cours: 3h</div>
+                            <div class="hour-item">TD: 1h30</div>
+                            <div class="hour-item">TP: 0h</div>
+                        </div>
+                        <div class="selection-options">
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Probabilités avancées - Cours" id="proba_cours">
+                                <label class="checkbox-label" for="proba_cours">Cours</label>
+                            </div>
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Probabilités avancées - TD" id="proba_td">
+                                <label class="checkbox-label" for="proba_td">TD</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subject-card">
+                        <div class="subject-header">
+                            <div class="subject-name">Statistique paramétrique</div>
+                            <div class="subject-code">UEF512</div>
+                        </div>
+                        <div class="hours-info">
+                            <div class="hour-item">Cours: 3h</div>
+                            <div class="hour-item">TD: 1h30</div>
+                            <div class="hour-item">TP: 0h</div>
+                        </div>
+                        <div class="selection-options">
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Statistique paramétrique - Cours" id="stat_cours">
+                                <label class="checkbox-label" for="stat_cours">Cours</label>
+                            </div>
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Statistique paramétrique - TD" id="stat_td">
+                                <label class="checkbox-label" for="stat_td">TD</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subject-card">
+                        <div class="subject-header">
+                            <div class="subject-name">Mesure et intégration</div>
+                            <div class="subject-code">UEF513</div>
+                        </div>
+                        <div class="hours-info">
+                            <div class="hour-item">Cours: 3h</div>
+                            <div class="hour-item">TD: 1h30</div>
+                            <div class="hour-item">TP: 0h</div>
+                        </div>
+                        <div class="selection-options">
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Mesure et intégration - Cours" id="mesure_cours">
+                                <label class="checkbox-label" for="mesure_cours">Cours</label>
+                            </div>
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Mesure et intégration - TD" id="mesure_td">
+                                <label class="checkbox-label" for="mesure_td">TD</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subject-card">
+                        <div class="subject-header">
+                            <div class="subject-name">Systèmes d'informations et bases de données</div>
+                            <div class="subject-code">UEM511</div>
+                        </div>
+                        <div class="hours-info">
+                            <div class="hour-item">Cours: 3h</div>
+                            <div class="hour-item">TD: 1h30</div>
+                            <div class="hour-item">TP: 1h30</div>
+                        </div>
+                        <div class="selection-options">
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Systèmes d'informations et bases de données - Cours" id="bd_cours">
+                                <label class="checkbox-label" for="bd_cours">Cours</label>
+                            </div>
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Systèmes d'informations et bases de données - TD" id="bd_td">
+                                <label class="checkbox-label" for="bd_td">TD</label>
+                            </div>
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Systèmes d'informations et bases de données - TP" id="bd_tp">
+                                <label class="checkbox-label" for="bd_tp">TP</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subject-card">
+                        <div class="subject-header">
+                            <div class="subject-name">Analyse exploratoire de données</div>
+                            <div class="subject-code">UEM512</div>
+                        </div>
+                        <div class="hours-info">
+                            <div class="hour-item">Cours: 3h</div>
+                            <div class="hour-item">TD: 1h30</div>
+                            <div class="hour-item">TP: 0h</div>
+                        </div>
+                        <div class="selection-options">
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Analyse exploratoire de données - Cours" id="aed_cours">
+                                <label class="checkbox-label" for="aed_cours">Cours</label>
+                            </div>
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Analyse exploratoire de données - TD" id="aed_td">
+                                <label class="checkbox-label" for="aed_td">TD</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="subject-card">
+                        <div class="subject-header">
+                            <div class="subject-name">Initiation à la didactique des Mathématiques</div>
+                            <div class="subject-code">UED511</div>
+                        </div>
+                        <div class="hours-info">
+                            <div class="hour-item">Cours: 1h30</div>
+                            <div class="hour-item">TD: 0h</div>
+                            <div class="hour-item">TP: 0h</div>
+                        </div>
+                        <div class="selection-options">
+                            <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                                <input type="checkbox" name="selection" value="Initiation à la didactique des Mathématiques - Cours" id="didactique_cours">
+                                <label class="checkbox-label" for="didactique_cours">Cours</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary">
+                <h3>📋 Résumé de votre sélection</h3>
+                <div class="counter" id="counter">
+                    Choix sélectionnés: <span id="selectedCount">0</span> / 5 minimum
+                </div>
+                <div class="selected-list" id="selectedList">
+                    <div style="text-align: center; color: rgba(255,255,255,0.7);">Aucune sélection pour le moment</div>
+                </div>
+                <button type="submit" class="submit-btn" id="submitBtn" disabled>
+                    Valider ma sélection
+                </button>
+                <div id="errorMessage" class="error-message" style="display: none;"></div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let selectedChoices = [];
+
+        function toggleCheckbox(container) {
+            const checkbox = container.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            updateSelection();
+        }
+
+        function updateSelection() {
+            const checkboxes = document.querySelectorAll('input[name="selection"]');
+            selectedChoices = [];
+            
+            checkboxes.forEach(checkbox => {
+                const container = checkbox.closest('.checkbox-container');
+                if (checkbox.checked) {
+                    selectedChoices.push(checkbox.value);
+                    container.classList.add('checked');
+                } else {
+                    container.classList.remove('checked');
+                }
+            });
+
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const countElement = document.getElementById('selectedCount');
+            const listElement = document.getElementById('selectedList');
+            const submitBtn = document.getElementById('submitBtn');
+            const errorMessage = document.getElementById('errorMessage');
+
+            countElement.textContent = selectedChoices.length;
+
+            if (selectedChoices.length === 0) {
+                listElement.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.7);">Aucune sélection pour le moment</div>';
+            } else {
+                listElement.innerHTML = selectedChoices.map(choice => 
+                    <div class="selected-item">✓ ${choice}</div>
+                ).join('');
+            }
+
+            if (selectedChoices.length >= 5) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Valider ma sélection';
+                errorMessage.style.display = 'none';
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.textContent = Sélectionnez ${5 - selectedChoices.length} choix de plus;
+                errorMessage.style.display = 'none';
+            }
+        }
+
+        document.getElementById('selectionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const teacherName = document.getElementById('teacherName').value.trim();
+            
+            if (!teacherName) {
+                alert('Veuillez entrer votre nom complet.');
+                document.getElementById('teacherName').focus();
+                return;
+            }
+            
+            if (selectedChoices.length < 5) {
+                const errorMessage = document.getElementById('errorMessage');
+                errorMessage.textContent = 'Vous devez sélectionner au moins 5 choix avant de valider.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            // Simulation d'envoi - ici vous pourriez envoyer les données à un serveur
+            const summary = Sélection validée avec succès pour ${teacherName}!\n\nChoix sélectionnés:\n${selectedChoices.join('\n')};
+            alert(summary);
+            
+            // Reset du formulaire
+            document.getElementById('teacherName').value = '';
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            selectedChoices = [];
+            updateSelection();
+        });
+
+        // Initialisation
+        updateSelection();
+
+        // Gestion des checkbox avec les clics sur les labels
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', updateSelection);
+        });
+    </script>
+</body>
+</html>
